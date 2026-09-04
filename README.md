@@ -2,15 +2,15 @@
 
 Learn scoped live data with player resources, supply, and hero levels. Handles missing data explicitly and includes offline scenarios and full TypeScript source.
 
-[Try it now](https://w3booster.github.io/app-resource-monitor/) · [Developer docs](https://website.w3booster.com/developer/) · [All examples](https://github.com/W3Booster/app-examples)
+[Try it now](https://w3booster.github.io/app-example-resource-monitor/) · [Developer docs](https://website.w3booster.com/developer/) · [All examples](https://github.com/W3Booster/app-examples)
 
 ## Run locally
 
 Node.js 22.22.3 or newer. No account, Warcraft III, desktop client, or database needed for demo mode.
 
 ```sh
-git clone https://github.com/W3Booster/app-resource-monitor.git
-cd app-resource-monitor
+git clone https://github.com/W3Booster/app-example-resource-monitor.git
+cd app-example-resource-monitor
 npm ci
 npm run dev
 ```
@@ -28,7 +28,7 @@ The checked-in binding belongs to the official Resource Monitor app. Cloning it 
 3. Bind your new public client ID:
 
    ```sh
-   npx w3booster-settings init YOUR_CLIENT_ID --endpoint https://api.w3booster.com
+   npm run app:fork -- YOUR_NEW_CLIENT_ID
    ```
 
 4. Commit the generated binding and package.json. Use **Test locally** with `http://localhost:5173/?demo=0`, then launch through W3Booster.
