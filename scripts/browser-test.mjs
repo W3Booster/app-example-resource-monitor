@@ -17,7 +17,7 @@ try {
   assert.equal(await page.locator('body').getAttribute('data-theme'), config.theme);
   assert.equal(await page.locator('.repository-link').getAttribute('href'), config.repository);
   assert.equal(await page.locator('.badge').textContent(), 'DEMO DATA');
-  assert.equal(await page.getByRole('button', { name: 'Open compact window' }).isDisabled(), true);
+  assert.equal(await page.getByRole('button', { name: 'Open compact window' }).count(), 0);
   if (process.argv.includes('--screenshot')) {
     await page.evaluate(() => document.fonts.ready);
     await mkdir(new URL('../docs/', import.meta.url), { recursive: true });
@@ -41,7 +41,7 @@ try {
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, 'mobile horizontal overflow');
   if (config.overlay) {
     await page.goto(base + '/?view=overlay&demo=1&capture=1');
-    await page.waitForSelector('.broadcast-strip');
+    await page.waitForSelector('.resource-card');
     assert.equal(await page.locator('header').isVisible(), false);
     assert.equal(await page.evaluate(() => getComputedStyle(document.body).backgroundColor), 'rgba(0, 0, 0, 0)');
   }

@@ -2,7 +2,9 @@
   "name": "Resource Monitor",
   "description": "Learn scoped live data with player resources, supply, and hero levels. Handles missing data explicitly and includes offline scenarios and full TypeScript source.",
   "surfaces": [
-    "application"
+    "application",
+    "streamOverlay",
+    "ingameOverlay"
   ],
   "applicationUrl": "http://localhost:5173/?demo=0",
   "scopes": [
@@ -35,5 +37,7 @@
         ]
       }
     ]
-  }
+  },
+  "streamOverlayUrl": "http://localhost:5173/?view=overlay&demo=0",
+  "ingameOverlayUrl": "http://localhost:5173/?view=overlay&demo=0"
 }
