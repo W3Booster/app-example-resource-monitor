@@ -2,5 +2,8 @@
   "slug": "resource-monitor",
   "repository": "https://github.com/W3Booster/app-example-resource-monitor",
   "theme": "economy",
-  "overlay": true
+  "surfaces": [
+    "streamOverlay",
+    "ingameOverlay"
+  ]
 }

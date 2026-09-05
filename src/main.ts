@@ -1,7 +1,7 @@
-import './style.css';
+import './hud.css';
 import { classifyW3BoosterError } from '@w3booster/sdk';
 import { w3boosterApp } from './w3booster.generated';
-import { resources } from './render';
+import { resources, preview } from './hud';
 import { element } from './ui';
 
 const query = new URLSearchParams(location.search);
@@ -9,7 +9,7 @@ document.body.dataset.application = w3boosterApp.clientId;
 // One repository, one app.
 const view = query.get('view') || 'application';
 const theme = 'economy';
-const presentation = { brand: 'RESOURCE MONITOR', title: 'Know your economy.', description: 'Learn scoped live data with player resources, supply, and hero levels. Handles missing data explicitly and includes offline scenarios and full TypeScript source.' };
+const presentation = { brand: 'OBSERVER ECONOMY HUD', title: 'Read the economy. Stay in the game.', description: 'An overlay-only observer tool for current gold, lumber, and supply. This browser page previews the HUD; it is not a registered application window.' };
 document.body.dataset.theme = theme;
 document.title = presentation.brand + ' · W3Booster Examples';
 // Direct visits start offline; registered W3Booster URLs explicitly select demo=0.
@@ -47,7 +47,7 @@ const footer = element('footer');
 for (const [text, href] of [['Build your own', 'https://website.w3booster.com/developer/first-app/'], ['View source', 'https://github.com/W3Booster/app-example-resource-monitor'], ['SDK reference', 'https://website.w3booster.com/developer/api/']]) {
   const link = element('a', text); link.href = href; footer.append(link);
 }
-const sourceLink = element('a', 'Read this example’s code ↗', 'source-link'); sourceLink.href = 'https://github.com/W3Booster/app-example-resource-monitor/blob/main/src/render.ts'; sourceLink.target = '_blank'; sourceLink.rel = 'noopener noreferrer'; controls.append(sourceLink);
+const sourceLink = element('a', 'Read this example’s code ↗', 'source-link'); sourceLink.href = 'https://github.com/W3Booster/app-example-resource-monitor/blob/main/src/hud.ts'; sourceLink.target = '_blank'; sourceLink.rel = 'noopener noreferrer'; controls.append(sourceLink);
 shell.append(header, intro);
 shell.append(controls, status, content, feedback, diagnostic, footer); root.replaceChildren(shell);
 const demoOptions = demo ? { state: (await import('./scenarios')).scenarioState(query.get('scenario') || 'match'), interval: query.get('capture') === '1' || ['no-match', 'finished'].includes(query.get('scenario') || '') ? 0 : 1000 } : undefined;
@@ -63,7 +63,7 @@ runtime.lifecycle.subscribe(snapshot => {
     : `${snapshot.status}${snapshot.retry ? ` · attempt ${snapshot.retry.attempt}` : ''}`;
   document.body.dataset.connection = snapshot.status;
   document.body.dataset.synchronized = String(snapshot.isSynchronized);
-  content.replaceChildren(resources(snapshot.state));
+  content.replaceChildren(overlay ? resources(snapshot.isSynchronized ? snapshot.state : null) : preview(snapshot.state));
   details.textContent = JSON.stringify({ mode: demo ? 'demo' : 'live', status: snapshot.status, synchronized: snapshot.isSynchronized, match: snapshot.state?.match.status, dataCapabilities: snapshot.state?.capabilities || [], host: snapshot.host, definitionRevision: w3boosterApp.revision }, null, 2);
 }, { signal });
 runtime.client.on('issue', issue => { feedback.textContent = `A recoverable ${issue.source} issue occurred. See the browser console.`; console.warn(issue.source, issue.error); }, { signal });

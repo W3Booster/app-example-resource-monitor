@@ -1,42 +1,18 @@
 {
-  "name": "Resource Monitor",
-  "description": "Learn scoped live data with player resources, supply, and hero levels. Handles missing data explicitly and includes offline scenarios and full TypeScript source.",
+  "name": "Observer Economy HUD",
+  "description": "An overlay-only observer HUD for current gold, lumber, and supply. Compare available player data at a glance, with explicit missing values and supply-cap indicators.",
   "surfaces": [
-    "application",
     "streamOverlay",
     "ingameOverlay"
   ],
-  "applicationUrl": "http://localhost:5173/?demo=0",
   "scopes": [
     "match:read",
     "players:read",
-    "resources:read",
-    "heroes:read",
-    "overlay:read"
+    "resources:read"
   ],
   "settingsSchema": {
     "version": 1,
-    "sections": [
-      {
-        "id": "display",
-        "title": "Display",
-        "groups": [
-          {
-            "id": "appearance",
-            "title": "Appearance"
-          }
-        ],
-        "fields": [
-          {
-            "key": "display.title",
-            "label": "App title",
-            "type": "text",
-            "group": "appearance",
-            "default": "My first W3Booster app"
-          }
-        ]
-      }
-    ]
+    "sections": []
   },
   "streamOverlayUrl": "http://localhost:5173/?view=overlay&demo=0",
   "ingameOverlayUrl": "http://localhost:5173/?view=overlay&demo=0"

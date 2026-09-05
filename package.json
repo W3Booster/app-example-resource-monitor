@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Resource Monitor — a standalone W3Booster TypeScript example",
+  "description": "Observer Economy HUD — a focused W3Booster workflow example",
   "license": "MIT",
   "repository": "https://github.com/W3Booster/app-example-resource-monitor",
   "scripts": {
@@ -33,5 +33,6 @@
     "clientId": "app_57fc0d3d38cdfba3e10fa7c5",
     "settingsOutput": "src/w3booster.generated.ts",
     "endpoint": "https://api.w3booster.com"
-  }
+  },
+  "author": "W3Pad"
 }
