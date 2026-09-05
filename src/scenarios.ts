@@ -13,7 +13,7 @@ export function scenarioState(name: string) {
   if (name === 'starting') return { ...state, match: { ...state.match, status: 'starting' as const } };
   if (name === 'replay') return { ...state, match: { ...state.match, isObserver: false, isReplay: true } };
   if (name === 'missing-data') return {
-    match: state.match, capabilities: ['match', 'players'] as const,
+    gameContext: state.gameContext, match: state.match, capabilities: ['match', 'players'] as const,
     players: state.players.map(({ id, name, race, team }) => ({ id, name, race, team }))
   };
   if (name === 'finished') return { ...state, match: { ...state.match, status: 'finished' as const } };
