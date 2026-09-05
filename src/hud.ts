@@ -7,7 +7,7 @@ export function observerMessage(state: MatchState | null): [string, string] | nu
   if (!state) return ['Waiting for match data', 'The HUD will appear once W3Booster delivers fresh observer or replay data.'];
   if (state.match.status === 'none') return ['Waiting for an observer game', 'Observe a Warcraft III match or watch a replay to see each player’s gold, lumber, and supply.'];
   if (state.match.status === 'finished') return ['Observer game ended', 'Observe another match or watch a replay to resume the economy HUD.'];
-  if (!isObserverOrReplayMatch(state.match)) return ['Observer mode required', 'This example only displays resources while observing a match or watching a replay. It stays inactive when you are playing.'];
+  if (!isObserverOrReplayMatch(state.match)) return ['Observer mode required', 'Resources are shown only while observing or watching a replay.'];
   if (state.match.status !== 'running') return ['Waiting for the observer game to start', 'The economy HUD will appear when this match starts.'];
   return null;
 }
@@ -49,8 +49,7 @@ export function resources(state: MatchState | null) {
 
 export function preview(state: MatchState | null) {
   const view = element('section', '', 'hud-preview');
-  view.append(element('span', 'BROWSER DEMO / NOT AN APPLICATION SURFACE', 'eyebrow'));
   const stage = element('div', '', 'hud-stage'); stage.append(resources(state));
-  view.append(stage, element('h2', 'Watch the economy without leaving the match.'), element('p', 'For observers comparing current gold, lumber, and supply. Amber supply flags mean the current cap is reached—not a prediction. Missing values stay unavailable; this app cannot unlock hidden or ungranted data.'), element('p', 'Install the example, then enable Stream or In-game. For OBS, use Set up OBS in W3Booster: one browser source carries all enabled stream overlays. No separate app window is needed.'));
+  view.append(stage, element('p', 'Enable Stream or In-game in W3Booster. For OBS, use Set up OBS.'));
   return view;
 }

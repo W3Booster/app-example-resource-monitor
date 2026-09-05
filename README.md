@@ -1,6 +1,6 @@
 # Observer Economy
 
-A focused W3Booster example by **W3Pad**. Compare current gold, lumber, and supply without leaving the match. This is an **overlay-only** observer tool, not a dashboard squeezed into a corner.
+A focused W3Booster example. Compare current gold, lumber, and supply without leaving the match. This is an **overlay-only** observer tool, not a dashboard squeezed into a corner.
 
 [Try the demo](https://w3booster.github.io/app-example-resource-monitor/) · [Developer docs](https://website.w3booster.com/developer/) · [All examples](https://website.w3booster.com/developer/examples/)
 
@@ -34,6 +34,8 @@ When the connection is unsynchronized, overlay output remains hidden to avoid
 presenting a stale match state as current.
 
 An amber supply indicator means current supply has reached a positive cap; it does not infer a future supply block. No hero roster, trend history, paid-data bypass, or hidden-information access is included. Scopes only request data; the host's authorization and available match data remain authoritative.
+
+The interface uses W3Booster-style dark surfaces, compact controls and a distinct accent. `src/shell.css` contains the small, standalone shell; the feature stylesheet contains only this app’s layout. Headings describe the task, not a marketing message.
 
 ## Surfaces and minimum permissions
 
