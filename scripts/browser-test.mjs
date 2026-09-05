@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile, mkdir } from 'node:fs/promises';
 import { chromium } from 'playwright';
 import { preview } from 'vite';
+import { createDemoState } from '@w3booster/sdk/testing';
 
 const config = JSON.parse(await readFile(new URL('../example.json', import.meta.url), 'utf8'));
 const definition = JSON.parse(await readFile(new URL('../app-definition.json', import.meta.url), 'utf8'));
@@ -66,6 +67,29 @@ try {
   }
   await page.setViewportSize({ width: 390, height: 844 }); await open('capture=1');
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, 'mobile overflow');
+  if (config.slug === 'resource-monitor') {
+    for (const view of ['application', 'overlay']) {
+      for (const [scenario, message] of [
+        ['no-match', 'Waiting for an observer game'],
+        ['player-match', 'Observer mode required'],
+        ['unknown-mode', 'Observer mode required'],
+        ['starting', 'Waiting for the observer game to start'],
+        ['finished', 'Observer game ended']
+      ]) {
+        await open(`view=${view}&scenario=${scenario}&capture=1`);
+        assert.equal(await page.locator('.resource-card').count(), 0, scenario + ' must not display resources');
+        assert.equal(await page.locator('.economy-notice').isVisible(), true, scenario + ' must explain its inactive state');
+        assert.equal(await page.locator('.economy-notice h2').textContent(), message);
+        assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, 'inactive message mobile overflow');
+      }
+      for (const scenario of ['match', 'replay']) {
+        await open(`view=${view}&scenario=${scenario}&capture=1`);
+        assert.equal(await page.locator('.resource-card').count(), 2);
+        assert.equal(await page.locator('.economy-notice').count(), 0);
+        assert.match(await page.locator('.economy-heading').textContent(), scenario === 'replay' ? /REPLAY/ : /LIVE/);
+      }
+    }
+  }
   if (config.surfaces.includes('streamOverlay')) {
     await page.setViewportSize({ width: 1440, height: 960 });
     await open('view=overlay&demo=1&capture=1');
@@ -77,6 +101,11 @@ try {
     assert.equal(await page.locator(target).first().isVisible(), false, 'stale overlay must not look live');
     await open('view=overlay&demo=1&capture=1&scenario=' + (config.slug === 'settings-playground' ? 'off-air' : 'no-match'));
     assert.equal(await page.locator(target).first().isVisible(), false, 'inactive output must be hidden');
+    if (config.slug === 'resource-monitor') {
+      assert.equal(await page.locator('.economy-notice').isVisible(), true, 'the educational overlay must explain why it is inactive');
+      await page.evaluate(() => document.body.dataset.synchronized = 'false');
+      assert.equal(await page.locator('.economy-notice').isVisible(), false, 'a stale waiting message must not claim a current match state');
+    }
 
     // CSS transparency alone is insufficient: verify the embedded canvas against
     // the host background under both compositor color schemes.
@@ -87,6 +116,53 @@ try {
       const outside = await page.screenshot({ clip: { x: 1000, y: 500, width: 1, height: 1 } });
       assert.deepEqual(inside, outside, 'opaque iframe canvas under ' + scheme + ' host');
     }
+  }
+  if (config.slug === 'resource-monitor') {
+    // Real SDK + live broker/recorder protocol, with synthetic data and no real credentials.
+    const live = await context.newPage();
+    live.on('pageerror', error => errors.push(error.message));
+    const clientId = manifest.examples[0].clientId;
+    const state = createDemoState();
+    state.capabilities = ['match', 'players', 'resources'];
+    state.match.isObserver = true;
+    state.players = state.players.map(({ id, name, race, team }) => ({ id, name, race, team }));
+    state.application = { clientId, settings: {}, surface: 'streamOverlay' };
+    state.overlay = { settings: {}, misc: { localServerUrls: ['ws://127.0.0.1:42001'] } };
+    let broker;
+    let recorder;
+    let sequence = 0;
+    const sendState = () => broker.send(JSON.stringify({ version: '1.0', type: 'state.snapshot', sequence: ++sequence, data: state }));
+    await live.route('**/stream/v1/stream-tickets', route => {
+      const request = route.request().postDataJSON();
+      // An empty requested subset means the registered definition's grants.
+      assert.equal(request.scopes.includes('overlay:read'), false);
+      return route.fulfill({ json: { websocketUrl: 'wss://stream.example.test/apps', protocolVersion: '1.0', applicationRevision: request.applicationRevision } });
+    });
+    await live.routeWebSocket('wss://stream.example.test/apps', socket => { broker = socket; setTimeout(sendState, 20); });
+    await live.routeWebSocket('ws://127.0.0.1:42001', socket => { recorder = socket; });
+    await live.goto(base + '/?view=overlay&demo=0#w3session=synthetic-browser-test');
+    await live.waitForSelector('body[data-synchronized="true"]');
+    assert.equal(await live.locator('.resource-value.gold strong').first().textContent(), '—');
+    await assert.doesNotReject(async () => {
+      for (let attempt = 0; !recorder && attempt < 100; attempt++) await new Promise(resolve => setTimeout(resolve, 20));
+      assert.ok(recorder, 'minimal resource grant must connect to the advertised recorder');
+    });
+    recorder.send(JSON.stringify([
+      { class: 'W3Resource', slotId: 0, type: 1, value: 8750 },
+      { class: 'W3Resource', slotId: 0, type: 2, value: 1250 },
+      { class: 'W3Resource', slotId: 0, type: 5, value: 34 },
+      { class: 'W3Resource', slotId: 0, type: 4, value: 50 }
+    ]));
+    await live.waitForFunction(() => document.querySelector('.resource-value.gold strong')?.textContent === '875');
+    assert.equal(await live.locator('.resource-value.lumber strong').first().textContent(), '125');
+    assert.equal(await live.locator('.resource-value.supply strong').first().textContent(), '34 / 50');
+    recorder.send(JSON.stringify([{ class: 'W3Resource', slotId: 0, type: 1, value: 9100 }]));
+    await live.waitForFunction(() => document.querySelector('.resource-value.gold strong')?.textContent === '910');
+    state.match.isObserver = false;
+    sendState();
+    await live.getByRole('heading', { name: 'Observer mode required' }).waitFor();
+    assert.equal(await live.locator('.resource-card').count(), 0, 'leaving observer mode removes previous resource values');
+    await live.close();
   }
   await page.goto(base + '/?demo=0');
   await page.waitForFunction(() => document.body.innerText.includes('Opening localhost directly does not authorize') || document.body.innerText.includes('Could not start'), { timeout: 20000 });

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Observer Economy HUD — a focused W3Booster workflow example",
+  "description": "Observer Economy — a focused W3Booster workflow example",
   "license": "MIT",
   "repository": "https://github.com/W3Booster/app-example-resource-monitor",
   "scripts": {

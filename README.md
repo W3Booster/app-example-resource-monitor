@@ -1,4 +1,4 @@
-# Observer Economy HUD
+# Observer Economy
 
 A focused W3Booster example by **W3Pad**. Compare current gold, lumber, and supply without leaving the match. This is an **overlay-only** observer tool, not a dashboard squeezed into a corner.
 
@@ -23,8 +23,15 @@ Open **http://localhost:5173/**. Expect **DEMO DATA** and **Connected · synchro
 
 1. Open the demo and compare each player's resource row.
 2. Try **missing data**: absent values remain unavailable, never zero or invented.
-3. Try **teams** and **finished**: the layout expands and a finished match is explicitly labeled as a final snapshot.
-4. Try **no match**: output disappears rather than covering the game with a waiting panel.
+3. Try **teams** and **replay**: the layout expands for teams; active replays show a REPLAY label.
+4. Try **no match**, **player match**, **unknown mode**, **starting**, and **finished**: resource rows are replaced with a short explanation of why the HUD is inactive.
+
+Resource rows require a synchronized, running match with `isObserver: true` or
+`isReplay: true`. Missing observer/replay flags never imply observer access. Unlike
+a production overlay that may hide while idle, this educational example displays
+a message in both the browser preview and the overlay so users know what to do.
+When the connection is unsynchronized, overlay output remains hidden to avoid
+presenting a stale match state as current.
 
 An amber supply indicator means current supply has reached a positive cap; it does not infer a future supply block. No hero roster, trend history, paid-data bypass, or hidden-information access is included. Scopes only request data; the host's authorization and available match data remain authoritative.
 
@@ -70,7 +77,7 @@ npm run screenshots
 
 Tests exercise the real workflow, minimal scopes, configured surfaces, mobile layout, demo/live isolation, and authorization failures. Screenshots capture the real UI, not a mockup.
 
-![Observer Economy HUD: actual runnable interface](docs/screenshot.png)
+![Observer Economy: actual runnable interface](docs/screenshot.png)
 
 The included GitHub Actions workflow checks the project and deploys `dist/` to Pages. Enable **Settings → Pages → GitHub Actions** in your fork and replace the official URLs. The build uses the checked-in SDK lockfile and does not fetch private data. Its `example-bindings.json` records the binding actually compiled and the tested supported surfaces.
 

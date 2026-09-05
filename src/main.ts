@@ -1,7 +1,7 @@
 import './hud.css';
 import { classifyW3BoosterError } from '@w3booster/sdk';
 import { w3boosterApp } from './w3booster.generated';
-import { resources, preview } from './hud';
+import { resources, preview, observerMessage } from './hud';
 import { element } from './ui';
 
 const query = new URLSearchParams(location.search);
@@ -9,7 +9,7 @@ document.body.dataset.application = w3boosterApp.clientId;
 // One repository, one app.
 const view = query.get('view') || 'application';
 const theme = 'economy';
-const presentation = { brand: 'OBSERVER ECONOMY HUD', title: 'Read the economy. Stay in the game.', description: 'An overlay-only observer tool for current gold, lumber, and supply. This browser page previews the HUD; it is not a registered application window.' };
+const presentation = { brand: 'OBSERVER ECONOMY', title: 'Read the economy. Stay in the game.', description: 'An overlay-only observer tool for current gold, lumber, and supply. This browser page previews the HUD; it is not a registered application window.' };
 document.body.dataset.theme = theme;
 document.title = presentation.brand + ' · W3Booster Examples';
 // Direct visits start offline; registered W3Booster URLs explicitly select demo=0.
@@ -59,11 +59,12 @@ const signal = uiLifetime.signal;
 
 runtime.lifecycle.subscribe(snapshot => {
   status.textContent = snapshot.status === 'connected'
-    ? (snapshot.isSynchronized ? (snapshot.state?.match.status === 'none' ? 'Connected · waiting for a match' : 'Connected · synchronized') : 'Connected · waiting for fresh data')
+    ? (snapshot.isSynchronized ? `Connected · ${observerMessage(snapshot.state)?.[0] || 'synchronized'}` : 'Connected · waiting for fresh data')
     : `${snapshot.status}${snapshot.retry ? ` · attempt ${snapshot.retry.attempt}` : ''}`;
   document.body.dataset.connection = snapshot.status;
   document.body.dataset.synchronized = String(snapshot.isSynchronized);
-  content.replaceChildren(overlay ? resources(snapshot.isSynchronized ? snapshot.state : null) : preview(snapshot.state));
+  const state = snapshot.isSynchronized ? snapshot.state : null;
+  content.replaceChildren(overlay ? resources(state) : preview(state));
   details.textContent = JSON.stringify({ mode: demo ? 'demo' : 'live', status: snapshot.status, synchronized: snapshot.isSynchronized, match: snapshot.state?.match.status, dataCapabilities: snapshot.state?.capabilities || [], host: snapshot.host, definitionRevision: w3boosterApp.revision }, null, 2);
 }, { signal });
 runtime.client.on('issue', issue => { feedback.textContent = `A recoverable ${issue.source} issue occurred. See the browser console.`; console.warn(issue.source, issue.error); }, { signal });
