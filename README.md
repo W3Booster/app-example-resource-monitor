@@ -2,7 +2,7 @@
 
 A focused W3Booster example. Compare current gold, lumber, and supply without leaving the match. This is an **overlay-only** observer tool, not a dashboard squeezed into a corner.
 
-[Try the demo](https://w3booster.github.io/app-example-resource-monitor/) · [Developer docs](https://website.w3booster.com/developer/) · [All examples](https://website.w3booster.com/developer/examples/)
+[Try the demo](https://w3booster.github.io/app-example-resource-monitor/) · [Developer docs](https://w3booster.com/developer/) · [All examples](https://w3booster.com/developer/examples/)
 
 The repository URL remains `app-example-resource-monitor` so existing links and installations survive the workflow redesign.
 
@@ -85,7 +85,7 @@ The included GitHub Actions workflow checks the project and deploys `dist/` to P
 
 After editing your registered contract, run `npm run w3booster:sync`; `npm run w3booster:check` verifies the current public definition. Never put credentials or real user captures into the repository or Pages secrets.
 
-For a complete Angular starting point, [build from Match Vision](https://website.w3booster.com/developer/match-vision/). All examples remain together in the [example library](https://website.w3booster.com/developer/examples/).
+For a complete Angular starting point, [build from Match Vision](https://w3booster.com/developer/match-vision/). All examples remain together in the [example library](https://w3booster.com/developer/examples/).
 
 MIT licensed; retain [LICENSE](LICENSE) when reusing source. No Warcraft artwork is bundled.
 
