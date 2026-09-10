@@ -133,12 +133,12 @@ try {
     let broker;
     let recorder;
     let sequence = 0;
-    const sendState = () => broker.send(JSON.stringify({ version: '2.0', type: 'state.snapshot', sequence: ++sequence, data: state }));
+    const sendState = () => broker.send(JSON.stringify({ version: '3.0', type: 'state.snapshot', sequence: ++sequence, data: state }));
     await live.route('**/stream/v1/stream-tickets', route => {
       const request = route.request().postDataJSON();
       // An empty requested subset means the registered definition's grants.
       assert.equal(request.scopes.includes('overlay:read'), false);
-      return route.fulfill({ json: { websocketUrl: 'wss://stream.example.test/apps', protocolVersion: '2.0', applicationRevision: request.applicationRevision } });
+      return route.fulfill({ json: { websocketUrl: 'wss://stream.example.test/apps', protocolVersion: '3.0', applicationRevision: request.applicationRevision } });
     });
     await live.routeWebSocket('wss://stream.example.test/apps', socket => { broker = socket; setTimeout(sendState, 20); });
     await live.routeWebSocket('ws://127.0.0.1:42001', socket => { recorder = socket; });
